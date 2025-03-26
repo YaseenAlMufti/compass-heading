@@ -1,23 +1,35 @@
 import Foundation
 import Capacitor
+import CoreMotion
 
-/**
- * Please read the Capacitor iOS Plugin Development Guide
- * here: https://capacitorjs.com/docs/plugins/ios
- */
 @objc(CompassHeadingPlugin)
-public class CompassHeadingPlugin: CAPPlugin, CAPBridgedPlugin {
-    public let identifier = "CompassHeadingPlugin"
-    public let jsName = "CompassHeading"
-    public let pluginMethods: [CAPPluginMethod] = [
-        CAPPluginMethod(name: "echo", returnType: CAPPluginReturnPromise)
-    ]
-    private let implementation = CompassHeading()
+public class CompassHeadingPlugin: CAPPlugin {
 
-    @objc func echo(_ call: CAPPluginCall) {
-        let value = call.getString("value") ?? ""
-        call.resolve([
-            "value": implementation.echo(value)
-        ])
+    let motionManager = CMMotionManager()
+    var useTrueNorth = false
+
+    @objc func start(_ call: CAPPluginCall) {
+        useTrueNorth = call.getBool("useTrueNorth") ?? false
+
+        if motionManager.isDeviceMotionAvailable {
+            motionManager.deviceMotionUpdateInterval = 0.2
+            motionManager.startDeviceMotionUpdates(using: .xMagneticNorthZVertical, to: .main) { (motion, error) in
+                if let attitude = motion?.attitude {
+                    let headingRadians = attitude.yaw
+                    let headingDegrees = (headingRadians * 180 / .pi + 360).truncatingRemainder(dividingBy: 360)
+
+                    let result: [String: Any] = ["heading": headingDegrees]
+                    self.notifyListeners("headingChange", data: result)
+                }
+            }
+            call.resolve()
+        } else {
+            call.reject("DeviceMotion not available")
+        }
+    }
+
+    @objc func stop(_ call: CAPPluginCall) {
+        motionManager.stopDeviceMotionUpdates()
+        call.resolve()
     }
 }

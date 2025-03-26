@@ -1,7 +1,7 @@
 {
   "name": "@yaseenalmufti/compass-heading",
-  "version": "0.0.1",
-  "description": "✅ Real-time heading updates (0–360°)✅ Choose between magnetic or true north✅ Native support for Android and iOS✅ No GPS required (just location permission)✅ Works even when standing still (no movement needed)",
+  "version": "1.0.0",
+  "description": "Real-time heading updates (0-360°). Choose between magnetic or true north. Native support for Android and iOS. No GPS required (just location permission). Works even when standing still (no movement needed)",
   "main": "dist/plugin.cjs.js",
   "module": "dist/esm/index.js",
   "types": "dist/esm/index.d.ts",
