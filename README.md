@@ -74,16 +74,16 @@ await CompassHeading.stop();
 
 ## API
 
-# `start(options?: { useTrueNorth?: boolean }): Promise<void>`
+#### `start(options?: { useTrueNorth?: boolean }): Promise<void>`
 Start compass updates. Set `useTrueNorth: true` to apply magnetic declination.
 
-# `stop(): Promise<void>`
+#### `stop(): Promise<void>`
 Stop compass updates.
 
-# `addListener('headingChange', listener: (data: { heading: number }) => void)`
+#### `addListener('headingChange', listener: (data: { heading: number }) => void)`
 Subscribe to heading updates.
 
-# `removeAllListeners(): Promise<void>`
+#### `removeAllListeners(): Promise<void>`
 Unsubscribe from all listeners.
 
 ---
