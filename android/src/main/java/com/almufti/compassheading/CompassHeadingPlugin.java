@@ -1,12 +1,10 @@
 package com.almufti.compassheading;
 
 import android.content.Context;
-import android.hardware.GeomagneticField;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.location.Location;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -20,8 +18,6 @@ public class CompassHeadingPlugin extends Plugin implements SensorEventListener 
     private SensorManager sensorManager;
     private float[] accelerometerData = new float[3];
     private float[] magnetometerData = new float[3];
-    private boolean useTrueNorth = false;
-    private Location lastLocation = null;
 
     @Override
     public void load() {
@@ -30,8 +26,6 @@ public class CompassHeadingPlugin extends Plugin implements SensorEventListener 
 
     @PluginMethod
     public void start(PluginCall call) {
-        useTrueNorth = call.getBoolean("useTrueNorth", false);
-
         Sensor accel = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         Sensor magnet = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
@@ -44,19 +38,6 @@ public class CompassHeadingPlugin extends Plugin implements SensorEventListener 
     @PluginMethod
     public void stop(PluginCall call) {
         sensorManager.unregisterListener(this);
-        call.resolve();
-    }
-
-    @PluginMethod
-    public void setLocation(PluginCall call) {
-        double lat = call.getDouble("latitude", 0.0);
-        double lon = call.getDouble("longitude", 0.0);
-
-        Location location = new Location("");
-        location.setLatitude(lat);
-        location.setLongitude(lon);
-        lastLocation = location;
-
         call.resolve();
     }
 
@@ -76,20 +57,8 @@ public class CompassHeadingPlugin extends Plugin implements SensorEventListener 
             float azimuth = (float) Math.toDegrees(orientation[0]);
             azimuth = (azimuth + 360) % 360;
 
-            float finalHeading = azimuth;
-
-            if (useTrueNorth && lastLocation != null) {
-                GeomagneticField geoField = new GeomagneticField(
-                    (float) lastLocation.getLatitude(),
-                    (float) lastLocation.getLongitude(),
-                    0f,
-                    System.currentTimeMillis()
-                );
-                finalHeading = (azimuth + geoField.getDeclination() + 360) % 360;
-            }
-
             JSObject result = new JSObject();
-            result.put("heading", finalHeading);
+            result.put("heading", azimuth);
             notifyListeners("headingChange", result);
         }
     }

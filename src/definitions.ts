@@ -1,5 +1,5 @@
 export interface CompassHeadingPlugin {
-  start(options?: { useTrueNorth?: boolean }): Promise<void>;
+  start(): Promise<void>;
   stop(): Promise<void>;
   addListener(
     eventName: 'headingChange',

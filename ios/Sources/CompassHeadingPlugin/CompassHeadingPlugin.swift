@@ -6,14 +6,11 @@ import CoreMotion
 public class CompassHeadingPlugin: CAPPlugin {
 
     let motionManager = CMMotionManager()
-    var useTrueNorth = false
 
     @objc func start(_ call: CAPPluginCall) {
-        useTrueNorth = call.getBool("useTrueNorth") ?? false
-
         if motionManager.isDeviceMotionAvailable {
             motionManager.deviceMotionUpdateInterval = 0.2
-            motionManager.startDeviceMotionUpdates(using: .xMagneticNorthZVertical, to: .main) { (motion, error) in
+            motionManager.startDeviceMotionUpdates(using: .xArbitraryZVertical, to: .main) { (motion, error) in
                 if let attitude = motion?.attitude {
                     let headingRadians = attitude.yaw
                     let headingDegrees = (headingRadians * 180 / .pi + 360).truncatingRemainder(dividingBy: 360)
@@ -30,11 +27,6 @@ public class CompassHeadingPlugin: CAPPlugin {
 
     @objc func stop(_ call: CAPPluginCall) {
         motionManager.stopDeviceMotionUpdates()
-        call.resolve()
-    }
-
-    @objc func setLocation(_ call: CAPPluginCall) {
-        // No-op for now; could be used in the future
         call.resolve()
     }
 
