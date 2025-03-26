@@ -33,6 +33,11 @@ public class CompassHeadingPlugin: CAPPlugin {
         call.resolve()
     }
 
+    @objc func setLocation(_ call: CAPPluginCall) {
+        // No-op for now; could be used in the future
+        call.resolve()
+    }
+
     override public func removeAllListeners(_ call: CAPPluginCall) {
         motionManager.stopDeviceMotionUpdates()
         call.resolve()
