@@ -1,6 +1,6 @@
 # @yaseenalmufti/compass-heading
 
-Accurate real-time compass heading (magnetic or true north) for Capacitor apps.
+Accurate real-time compass heading (magnetic) for Capacitor apps.
 
 This plugin uses native motion sensors (magnetometer + accelerometer) to deliver smooth and precise heading data without GPS dependency.
 
@@ -9,7 +9,6 @@ This plugin uses native motion sensors (magnetometer + accelerometer) to deliver
 ## Features
 
 - ✅ Real-time heading updates (0–360°)
-- ✅ Choose between magnetic or true north
 - ✅ Native support for Android and iOS
 - ✅ No GPS required (just location permission)
 - ✅ Works even when standing still (no movement needed)
@@ -59,7 +58,7 @@ await Permissions.request({ name: 'geolocation' });
 import { CompassHeading } from '@yaseenalmufti/compass-heading';
 
 // Start heading updates (true north optional)
-await CompassHeading.start({ useTrueNorth: true });
+await CompassHeading.start();
 
 // Listen for heading changes
 CompassHeading.addListener('headingChange', (data) => {
@@ -74,8 +73,8 @@ await CompassHeading.stop();
 
 ## API
 
-#### `start(options?: { useTrueNorth?: boolean }): Promise<void>`
-Start compass updates. Set `useTrueNorth: true` to apply magnetic declination.
+#### `start(): Promise<void>`
+Start compass updates.
 
 #### `stop(): Promise<void>`
 Stop compass updates.
