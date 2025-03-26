@@ -32,4 +32,9 @@ public class CompassHeadingPlugin: CAPPlugin {
         motionManager.stopDeviceMotionUpdates()
         call.resolve()
     }
+
+    override public func removeAllListeners(_ call: CAPPluginCall) {
+        motionManager.stopDeviceMotionUpdates()
+        call.resolve()
+    }
 }

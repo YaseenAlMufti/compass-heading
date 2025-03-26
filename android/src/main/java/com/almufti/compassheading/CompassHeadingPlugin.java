@@ -98,4 +98,10 @@ public class CompassHeadingPlugin extends Plugin implements SensorEventListener 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // Not used
     }
+
+    @PluginMethod
+    public void removeAllListeners(PluginCall call) {
+        sensorManager.unregisterListener(this);
+        call.resolve();
+    }
 }
