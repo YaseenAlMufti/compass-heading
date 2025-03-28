@@ -9,6 +9,7 @@ This plugin uses native motion sensors (magnetometer + accelerometer) to deliver
 ## Features
 
 - ✅ Real-time heading updates (0–360°)
+- ✅ Real-time compass accuracy updates
 - ✅ Native support for Android and iOS
 - ✅ No GPS required (just location permission)
 - ✅ Works even when standing still (no movement needed)
@@ -63,6 +64,7 @@ await CompassHeading.start();
 // Listen for heading changes
 CompassHeading.addListener('headingChange', (data) => {
   console.log('Heading:', data.heading); // in degrees (0–360)
+  console.log('Accuracy:', data.accuracy); // 0 = low, 1 = medium, 2 = high
 });
 
 // Stop when done
@@ -79,7 +81,7 @@ Start compass updates.
 #### `stop(): Promise<void>`
 Stop compass updates.
 
-#### `addListener('headingChange', listener: (data: { heading: number }) => void)`
+#### `addListener('headingChange', listener: (data: { heading: number; accuracy: number; }) => void)`
 Subscribe to heading updates.
 
 #### `removeAllListeners(): Promise<void>`

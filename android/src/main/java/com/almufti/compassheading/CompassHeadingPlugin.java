@@ -51,6 +51,7 @@ public class CompassHeadingPlugin extends Plugin implements SensorEventListener 
 
         float[] rotationMatrix = new float[9];
         float[] orientation = new float[3];
+        int accuracy = event.accuracy;
 
         if (SensorManager.getRotationMatrix(rotationMatrix, null, accelerometerData, magnetometerData)) {
             SensorManager.getOrientation(rotationMatrix, orientation);
@@ -59,6 +60,7 @@ public class CompassHeadingPlugin extends Plugin implements SensorEventListener 
 
             JSObject result = new JSObject();
             result.put("heading", azimuth);
+            result.put("accuracy", accuracy);
             notifyListeners("headingChange", result);
         }
     }

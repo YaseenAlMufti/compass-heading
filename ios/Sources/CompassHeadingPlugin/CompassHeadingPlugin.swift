@@ -11,11 +11,14 @@ public class CompassHeadingPlugin: CAPPlugin {
         if motionManager.isDeviceMotionAvailable {
             motionManager.deviceMotionUpdateInterval = 0.2
             motionManager.startDeviceMotionUpdates(using: .xArbitraryZVertical, to: .main) { (motion, error) in
-                if let attitude = motion?.attitude {
-                    let headingRadians = attitude.yaw
+                if let motion = motion {
+                    let headingRadians = motion.attitude.yaw
                     let headingDegrees = (headingRadians * 180 / .pi + 360).truncatingRemainder(dividingBy: 360)
 
-                    let result: [String: Any] = ["heading": headingDegrees]
+                    let result: [String: Any] = [
+                        "heading": headingDegrees,
+                        "accuracy": motion.magneticField.accuracy.rawValue
+                    ]
                     self.notifyListeners("headingChange", data: result)
                 }
             }
