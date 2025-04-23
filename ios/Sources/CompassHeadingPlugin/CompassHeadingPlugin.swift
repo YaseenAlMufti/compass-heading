@@ -1,40 +1,56 @@
 import Foundation
 import Capacitor
-import CoreMotion
+import CoreLocation
 
 @objc(CompassHeadingPlugin)
-public class CompassHeadingPlugin: CAPPlugin {
+public class CompassHeadingPlugin: CAPPlugin, CAPBridgedPlugin, CLLocationManagerDelegate {
+    var locationManager: CLLocationManager!
 
-    let motionManager = CMMotionManager()
+    public let identifier = "CompassHeadingPlugin"
+    public let jsName = "CompassHeading"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "start", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "stop", returnType: CAPPluginReturnPromise)
+    ]
 
-    @objc func start(_ call: CAPPluginCall) {
-        if motionManager.isDeviceMotionAvailable {
-            motionManager.deviceMotionUpdateInterval = 0.2
-            motionManager.startDeviceMotionUpdates(using: .xArbitraryZVertical, to: .main) { (motion, error) in
-                if let motion = motion {
-                    let headingRadians = motion.attitude.yaw
-                    let headingDegrees = (headingRadians * 180 / .pi + 360).truncatingRemainder(dividingBy: 360)
-
-                    let result: [String: Any] = [
-                        "heading": headingDegrees,
-                        "accuracy": motion.magneticField.accuracy.rawValue
-                    ]
-                    self.notifyListeners("headingChange", data: result)
-                }
-            }
-            call.resolve()
-        } else {
-            call.reject("DeviceMotion not available")
-        }
+    override public func load() {
+        self.locationManager = CLLocationManager()
+        self.locationManager.delegate = self
     }
 
-    @objc func stop(_ call: CAPPluginCall) {
-        motionManager.stopDeviceMotionUpdates()
+    @objc func start(_ call: CAPPluginCall) {
+        self.locationManager.requestWhenInUseAuthorization()
+        
+        if CLLocationManager.headingAvailable() {
+            self.locationManager.startUpdatingLocation()
+            self.locationManager.startUpdatingHeading()
+        }
         call.resolve()
     }
 
+    @objc func stop(_ call: CAPPluginCall) {
+        locationManager?.stopUpdatingHeading()
+        locationManager?.stopUpdatingLocation()
+        call.resolve()
+    }
+
+    public func locationManager(_ manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+        let heading = newHeading.trueHeading > 0 ? newHeading.trueHeading : -1 * newHeading.magneticHeading
+
+        let result: [String: Any] = [
+            "heading": heading,
+            "accuracy": newHeading.headingAccuracy
+        ]
+        notifyListeners("headingChange", data: result)
+    }
+
+    public func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print("❌ Compass error: \(error.localizedDescription)")
+    }
+
     override public func removeAllListeners(_ call: CAPPluginCall) {
-        motionManager.stopDeviceMotionUpdates()
+        locationManager?.stopUpdatingHeading()
+        locationManager?.stopUpdatingLocation()
         call.resolve()
     }
 }
